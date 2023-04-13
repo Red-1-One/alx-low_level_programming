@@ -1,75 +1,113 @@
+#include <stdio.h>
 #include <stdlib.h>
-#include "main.h"
-#include "holberton.h"
-/**
- * count_word - helper function to count the number of words in a string
- * @s: string to evaluate
- *
- * Return: number of words
- */
-int count_word(char *s)
+
+int count_words(char *str)
 {
-	int flag, c, w;
+	int count = 0;
+	int i = 0;
 
-	flag = 0;
-	w = 0;
-
-	for (c = 0; s[c] != '\0'; c++)
+	while (str[i])
 	{
-		if (s[c] == ' ')
-			flag = 0;
-		else if (flag == 0)
+		if (str[i] != ' ')
 		{
-			flag = 1;
-			w++;
+			count++;
+			while (str[i] != ' ')
+				i++;
 		}
+		i++;
 	}
-	return (w);
+	return (count);
+}
+
+int len_words(char *s)
+{
+	int len = 0;
+
+	while (*s && *s != ' ')
+	{
+		len++;
+		s++;
+	}
+	return (len);
 }
 
 /**
- * **strtow - splits a string into words
- * @str: string to split
+ * _strncpy - copies a string
+ * @dest: destination string
+ * @src: source string
+ * @n: number of bytes to copy
  *
- * Return: pointer to an array of strings (Success)
- * or NULL (Error)
+ * Return: pointer to the resulting string
  */
+char *_strncpy(char *dest, char *src, int n)
+{
+	int i;
+
+	i = 0;
+
+	while (src[i] != '\0' && i < n)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
+
 char **strtow(char *str)
 {
-	char **matrix, *tmp;
-	int i, k = 0, len = 0, words, c = 0, start, end;
+	char **result;
+	int len;
+	int i = 0;
 
-	while (*(str + len))
-		len++;
-	words = count_word(str);
-	if (words == 0)
+	if (str == NULL || *str == '\0')
 		return (NULL);
 
-	matrix = (char **) malloc(sizeof(char *) * (words + 1));
-	if (matrix == NULL)
-		return (NULL);
-
-	for (i = 0; i <= len; i++)
+	result = malloc(sizeof(char *) * (count_words(str) + 1));
+	while (*str)
 	{
-		if (str[i] == ' ' || str[i] == '\0')
+		if (*str != ' ')
 		{
-			if (c)
+			len = len_words(str);
+			result[i] = malloc(sizeof(char) * len + 1);
+			if (!result[i])
 			{
-				end = i;
-				tmp = (char *) malloc(sizeof(char) * (c + 1));
-				if (tmp == NULL)
-					return (NULL);
-				while (start < end)
-					*tmp++ = str[start++];
-				*tmp = '\0';
-				matrix[k] = tmp - c;
-				k++;
-				c = 0;
+				for (int j = 0; j < i; i++)
+					free(result[j]);
+				free(result);
+				return (NULL);
 			}
+			_strncpy(result[i], str, len);
+
+			i++;
+			while (*str != ' ')
+				str++;
 		}
-		else if (c++ == 0)
-			start = i;
+		while (*str == ' ')
+			str++;
 	}
-	matrix[k] = NULL;
-	return (matrix);
+	return (result);
+}
+
+void print_tab(char **tab)
+{
+	int i;
+
+	for (i = 0; tab[i] != NULL; ++i)
+	{
+		printf("%s\n", tab[i]);
+	}
+}
+int main(void)
+{
+	char **tab;
+
+	tab = strtow("  ALX School  #cisfun  ");
+	if (tab == NULL)
+	{
+		printf("Failed\n");
+		return (1);
+	}
+	print_tab(tab);
+	return (0);
 }
